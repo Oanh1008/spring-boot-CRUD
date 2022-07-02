@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" >Student Management Application</a>
+        <br>
+        <br>
+        <br>
+        <form class="d-flex" action=""
+                   method="GET">
+            <input oninput="findStudent()" id="text" style="width: 200px; display: inline"  type="search" placeholder="Search"
+                   aria-label="Search" >
+            <button class="btn btn-outline-success" type="submit" >Search</button>
+        </form>
+    </div>
+</nav>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Dob</th>
+        <th scope="col">Age</th>
+    </tr>
+    </thead>
+    <tbody id="students">
+
+    </tbody>
+
+</table>
+<div style="height: 300px;width: 400px">
+    <form>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Enter name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" placeholder="email">
+        </div>
+        <div class="form-group">
+            <label for="dob">Dob:</label>
+            <input type="date" class="form-control" id="dob" placeholder="dob">
+        </div>
+        <div class="form-group">
+            <label for="age">age:</label>
+            <input type="number" class="form-control" id="age" placeholder="age">
+        </div>
+        <button type="button" class="btn btn-primary" id="add">Submit</button>
+    </form>
+</div>
+<!-- Button trigger modal -->
+<br>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="id-edit">Id:</label>
+                <input type="number" class="form-control" disabled id="id-edit" value="" >
+                <label for="name-edit">Name:</label>
+                <input type="text" class="form-control" id="name-edit" value="${student.name}" >
+                <label for="email-edit">Email:</label>
+                <input type="email" class="form-control" id="email-edit" >
+                <label for="dob-edit">Dob:</label>
+                <input type="date" class="form-control" id="dob-edit" >
+                <label for="age-edit">Age:</label>
+                <input type="number" class="form-control" id="age-edit" >
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="close-id" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateStudent()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+<br>
+<span>File</span>
+<input type="file" id="file" name="file" size="10"/>
+<input id="uploadbutton" type="button" value="Upload"/>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script>
+    getAllStudent()
+    $("#add").on("click",()=>{
+        addStudent();
+    })
+    function getDetailsStudent(id){
+       $.ajax({
+           url: `http://localhost:8080/api/v1/students/${id}`,
+           type: "GET"
+       }).done((student)=>{
+               $("#name-edit").val(student.name),
+               $("#email-edit").val(student.email),
+               $("#dob-edit").val(student.dob),
+               $("#age-edit").val(student.age),
+               $("#id-edit").val(student.id)
+           console.log(student);
+       })
+
+    }
+    function getAllStudent() {
+
+        $.ajax({
+            url: "http://localhost:8080/api/v1/students",
+            type: "GET"
+        }).done((students) => {
+            console.log(students)
+            let content = ``;
+            for (let i = 0; i < students.length; i++) {
+                content += `<tr>
+                                <th scope="row">${students[i].id}</th>
+                                <td>${students[i].name}</td>
+                                <td>${students[i].email}</td>
+                                <td>${students[i].dob}</td>
+                                <td>${students[i].age}</td>
+                                <td>
+                                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#exampleModalCenter" onclick="getDetailsStudent(${students[i].id})" ">Edit</button>
+                                <button class="btn btn-primary" type="button" onClick="deleteStudent(${students[i].id})">Delete</button>
+                                </td>
+                            </tr>`
+            }
+            $("#students").html(content);
+        })
+    }
+    function addStudent(){
+        let name=$("#name").val();
+        let email=$("#email").val();
+        let dob=$("#dob").val();
+        let age=$("#age").val();
+
+        let student={
+            "name":name,
+            "email":email,
+            "dob":dob,
+            "age":age
+        };
+        $.ajax({
+            url:`http://localhost:8080/api/v1/students`,
+            type:"POST",
+            data:JSON.stringify(student),
+            dataType:'json',
+            contentType: "application/json; charset=utf-8"
+        }).done(()=>{
+            getAllStudent();
+        })
+    }
+    function findStudent(){
+        let name=$("#text").val();
+        console.log(name)
+        $.ajax({
+            url:`http://localhost:8080/api/v1/students?name=${name}`,
+            type:"GET",
+            data:JSON.stringify(name),
+            dataType:'json',
+            contentType: "application/json; charset=utf-8"
+            }
+        ).done((response)=>{
+            let content = ``;
+            for (let i = 0; i < response.length; i++) {
+                content += `<tr>
+                                <th scope="row">${response[i].id}</th>
+                                <td>${response[i].name}</td>
+                                <td>${response[i].email}</td>
+                                <td>${response[i].dob}</td>
+                                <td>${response[i].age}</td>
+                                <td>
+                                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#exampleModalCenter" onclick="getDetailsStudent(${response[i].id})" ">Edit</button>
+                                <button class="btn btn-primary" type="button" onClick="deleteStudent(${response[i].id})">Delete</button>
+                                </td>
+                            </tr>`
+            }
+            $("#students").html(content);
+        })
+    }
+
+    function updateStudent() {
+        let id=$("#id-edit").val();
+
+        let student={
+            "name":$("#name-edit").val(),
+            "email":$("#email-edit").val(),
+            "dob":$("#dob-edit").val(),
+            "age":$("#age-edit").val()
+        }
+        $.ajax({
+            url:`http://localhost:8080/api/v1/students/${id}`,
+            type: "PUT",
+            data:JSON.stringify(student),
+            dataType:'json',
+            contentType: "application/json; charset=utf-8"
+        }).done(()=>{
+            getAllStudent();
+            $('#close-id').click();
+            let value=$("#text").val("");
+            console.log(value);
+            
+        })
+
+    }
+
+    function deleteStudent(id) {
+        $.ajax({
+            url:`http://localhost:8080/api/v1/students/${id}`,
+            type:"DELETE"
+        }).done(()=>{
+            getAllStudent();
+
+        })
+    }
+</script>
+</html>
