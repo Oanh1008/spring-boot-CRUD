@@ -2,6 +2,7 @@ package com.example.entity;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "student")
@@ -10,11 +11,14 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "firstname",nullable = false)
+    @NotNull(message = "*first name is required not null")
     private String firstName;
 
     @Column(name = "lastname")
+    @NotNull(message = "*first name is required not null")
     private String lastName;
     @Column(name = "email")
+    @NotNull(message = "*first name is required not null")
     private String email;
 
     public Student() {

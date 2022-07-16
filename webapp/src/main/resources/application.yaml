@@ -1,0 +1,18 @@
+# exposure
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+
+# Enable actuator/info
+
+#custom to show helpful project info
+spring:
+  security:
+    user:
+      name: 'admin'
+      password: '123'

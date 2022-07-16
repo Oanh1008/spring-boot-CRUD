@@ -26,11 +26,13 @@
         </ul>
     </div>
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <input  placeholder="search" >
-            </li>
-        </ul>
+        <form th:action="@{/students}" method="GET" class="d-flex">
+
+            <input name="text" value=""
+                   class="form-control me-2" type="search" placeholder="Search"
+                   aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
     </div>
 </nav>
 <br>
@@ -61,10 +63,17 @@
                     <td th:text ="${student.email}"></td>
                     <td>
                         <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-primary">Update</a>
-                        <a th:href="@{/students/{id}(id=${student.id})}" class="btn btn-danger">Delete</a>
+                        <a th:href="@{/students/{id}(id=${student.id})}" class="btn btn-danger" onclick="confirmDelete()">Delete
+
+                        </a>
                     </td>
             </tbody>
         </table>
     </div>
+    <script>
+        function confirmDelete(){
+            confirm("Do you confirm delete this student");
+        }
+    </script>
 </body>
 </html>
